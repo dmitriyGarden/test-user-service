@@ -1,0 +1,13 @@
+version: '3.6'
+services:
+  envoy:
+    image: envoyproxy/envoy:dev-d12d47b05a832ce04d9130a869fa72f7ddbcef28
+    ports:
+      - "10000:8888"
+    volumes:
+      - ./envoy-config.yaml:/etc/envoy/envoy.yaml
+      - ./proto/user.pb:/etc/envoy/user.proto
+  user:
+    build: ..
+    ports:
+      - "8080:8080"

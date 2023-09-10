@@ -4,8 +4,18 @@ package api;
 
 option go_package = "adapter/in/web/grpc_server/api";
 
+//    git clone https://github.com/googleapis/googleapis ./adapter/in/web/grpc_server/api/googleapi
+//    ...
+//    protoc -I ./adapter/in/web/grpc_server/api/googleapi -I ./adapter/in/web/grpc_server/api/proto --include_imports \
+//    --descriptor_set_out=./deploy/user.pb user.proto
+import "google/api/annotations.proto";
+
 service User {
-  rpc Login(LoginRequest) returns (LoginResponse) {}
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/user/login"
+    };
+  }
 }
 
 message LoginRequest {
