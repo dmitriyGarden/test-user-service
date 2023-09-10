@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "adapter/in/web/grpc_server/api";
+
+service User {
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+}
+
+message LoginRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
