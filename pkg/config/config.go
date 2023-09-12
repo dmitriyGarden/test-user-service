@@ -13,6 +13,7 @@ type Config struct {
 
 func (c *Config) init() error {
 	flag.String("config", "./config.yaml", "Path to the yaml config file")
+	flag.String("env", "./.env", "Path to the .env file")
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
 	err := viper.BindPFlags(pflag.CommandLine)
@@ -24,6 +25,15 @@ func (c *Config) init() error {
 	if err != nil {
 		return fmt.Errorf("viper.ReadInConfig: %w", err)
 	}
+	env := viper.GetString("env")
+	if env != "" {
+		viper.SetConfigFile(env)
+		err = viper.MergeInConfig()
+		if err != nil {
+			return fmt.Errorf("viper.MergeInConfig: %w", err)
+		}
+	}
+	viper.AutomaticEnv()
 	return nil
 }
 

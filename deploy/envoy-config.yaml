@@ -24,12 +24,14 @@ static_resources:
                         # Reference: https://envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter#route-configs-for-transcoded-requests
                         - match: {prefix: "/api.User"}
                           route: {cluster: userservice, timeout: 60s}
+                        - match: { prefix: "/api.Transaction" }
+                          route: { cluster: trasactionservice, timeout: 60s }
                 http_filters:
                   - name: envoy.filters.http.grpc_json_transcoder
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
-                      proto_descriptor: "/etc/envoy/user.proto"
-                      services: ["api.User"]
+                      proto_descriptor: "/etc/envoy/combined.proto"
+                      services: ["api.User", "api.Transaction"]
                       print_options:
                         add_whitespace: true
                         always_print_primitive_fields: true
@@ -60,4 +62,25 @@ static_resources:
                       # If you're running an older version of Docker, please use "docker.for.mac.localhost" instead.
                       # Reference: https://docs.docker.com/docker-for-mac/release-notes/#docker-community-edition-18030-ce-mac59-2018-03-26
                       address: user
+                      port_value: 8080
+    - name: trasactionservice
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      dns_lookup_family: V4_ONLY
+      typed_extension_protocol_options:
+        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+          "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+          explicit_http_config:
+            http2_protocol_options: { }
+      load_assignment:
+        cluster_name: trasactionservice
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      # WARNING: "docker.for.mac.localhost" has been deprecated from Docker v18.03.0.
+                      # If you're running an older version of Docker, please use "docker.for.mac.localhost" instead.
+                      # Reference: https://docs.docker.com/docker-for-mac/release-notes/#docker-community-edition-18030-ce-mac59-2018-03-26
+                      address: transactions
                       port_value: 8080

@@ -5,6 +5,6 @@ import (
 	"github.com/dmitriyGarden/test-user-service/model"
 )
 
-func GetWebGrpcAdapter(cfg server.IConfig, srv model.IUser, l model.ILogger) (model.IWebAdapter, error) {
-	return server.New(cfg, srv, l)
+func GetWebGrpcAdapter(cfg server.IConfig, srv model.IUser, tr model.ITransaction, l model.ILogger) (model.IWebAdapter, error) {
+	return server.New(cfg, srv, tr, l)
 }

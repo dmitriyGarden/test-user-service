@@ -1,0 +1,2 @@
+CREATE DATABASE userDB;
+CREATE DATABASE transactionDB;

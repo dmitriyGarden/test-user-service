@@ -6,8 +6,57 @@ services:
       - "10000:8888"
     volumes:
       - ./envoy-config.yaml:/etc/envoy/envoy.yaml
-      - ./proto/user.pb:/etc/envoy/user.proto
+      - ./proto/combined.pb:/etc/envoy/combined.proto
   user:
     build: ..
-    ports:
-      - "8080:8080"
+
+    depends_on:
+      - user-db-postgres
+      - nats
+    environment:
+      - DATABASE_HOST=user-db-postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=psqladmin
+      - DATABASE_PASSWORD=admin
+      - DATABASE_NAME=userdb
+      - NATS_HOST=nats
+      - NATS_PORT=4222
+      - NATS_USER=nats
+      - NATS_PASSWORD=mysecret
+  transactions:
+    build: https://github.com/dmitriyGarden/test-transaction-service.git#main
+    depends_on:
+      - user-db-postgres
+      - nats
+    environment:
+      - DATABASE_HOST=user-db-postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=psqladmin
+      - DATABASE_PASSWORD=admin
+      - DATABASE_NAME=transactiondb
+      - NATS_HOST=nats
+      - NATS_PORT=4222
+      - NATS_USER=nats
+      - NATS_PASSWORD=mysecret
+  user-db-postgres:
+    image: postgres:13
+    environment:
+      - DATABASE_HOST=127.0.0.1
+      - POSTGRES_USER=psqladmin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=postgres
+#    ports:
+#      - "5433:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  nats:
+    environment:
+      - NATS_ENABLE_AUTH=yes
+      - NATS_USERNAME=nats
+      - NATS_PASSWORD=mysecret
+    image: bitnami/nats:latest
+#    ports:
+#      - "4222:4222"
+#      - "8222:8222"
+#      - "6222:6222"
+

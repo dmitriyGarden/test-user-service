@@ -6,5 +6,7 @@ import (
 )
 
 func New() model.ILogger {
-	return log.New()
+	l := log.New()
+	l.SetLevel(log.DebugLevel)
+	return l
 }

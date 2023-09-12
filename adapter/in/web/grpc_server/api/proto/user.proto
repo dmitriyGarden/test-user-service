@@ -7,13 +7,18 @@ option go_package = "adapter/in/web/grpc_server/api";
 //    git clone https://github.com/googleapis/googleapis ./adapter/in/web/grpc_server/api/googleapi
 //    ...
 //    protoc -I ./adapter/in/web/grpc_server/api/googleapi -I ./adapter/in/web/grpc_server/api/proto --include_imports \
-//    --descriptor_set_out=./deploy/user.pb user.proto
+//    --descriptor_set_out=./deploy/proto/user.pb user.proto
 import "google/api/annotations.proto";
 
 service User {
   rpc Login(LoginRequest) returns (LoginResponse) {
     option (google.api.http) = {
       post: "/user/login"
+    };
+  }
+  rpc Balance(Empty) returns (UserBalance) {
+    option (google.api.http) = {
+      get: "/user/balance"
     };
   }
 }
@@ -26,3 +31,9 @@ message LoginRequest {
 message LoginResponse {
   string token = 1;
 }
+
+message UserBalance {
+  int64 amount = 1;
+}
+
+message Empty {}
